@@ -1,0 +1,150 @@
+{
+  "version": 1,
+  "cli": {
+    "defaultCollection": "@nrwl/angular"
+  },
+  "defaultProject": "ng-pomo",
+  "schematics": {
+    "@nrwl/angular": {
+      "application": {
+        "linter": "eslint"
+      },
+      "library": {
+        "linter": "eslint"
+      },
+      "storybook-configuration": {
+        "linter": "eslint"
+      }
+    },
+    "@nrwl/angular:application": {
+      "style": "css",
+      "linter": "eslint",
+      "unitTestRunner": "jest",
+      "e2eTestRunner": "cypress"
+    },
+    "@nrwl/angular:library": {
+      "style": "css",
+      "linter": "eslint",
+      "unitTestRunner": "jest"
+    },
+    "@nrwl/angular:component": {
+      "style": "css"
+    }
+  },
+  "projects": {
+    "ng-pomo": {
+      "projectType": "application",
+      "root": "apps/ng-pomo",
+      "sourceRoot": "apps/ng-pomo/src",
+      "prefix": "",
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-angular:browser",
+          "options": {
+            "outputPath": "dist/apps/ng-pomo",
+            "index": "apps/ng-pomo/src/index.html",
+            "main": "apps/ng-pomo/src/main.ts",
+            "polyfills": "apps/ng-pomo/src/polyfills.ts",
+            "tsConfig": "apps/ng-pomo/tsconfig.app.json",
+            "aot": true,
+            "assets": [
+              "apps/ng-pomo/src/favicon.ico",
+              "apps/ng-pomo/src/assets"
+            ],
+            "styles": ["apps/ng-pomo/src/styles.css"],
+            "scripts": []
+          },
+          "configurations": {
+            "production": {
+              "fileReplacements": [
+                {
+                  "replace": "apps/ng-pomo/src/environments/environment.ts",
+                  "with": "apps/ng-pomo/src/environments/environment.prod.ts"
+                }
+              ],
+              "optimization": true,
+              "outputHashing": "all",
+              "sourceMap": false,
+              "namedChunks": false,
+              "extractLicenses": true,
+              "vendorChunk": false,
+              "buildOptimizer": true,
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "2mb",
+                  "maximumError": "5mb"
+                },
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "6kb",
+                  "maximumError": "10kb"
+                }
+              ]
+            }
+          }
+        },
+        "serve": {
+          "builder": "@angular-devkit/build-angular:dev-server",
+          "options": {
+            "browserTarget": "ng-pomo:build"
+          },
+          "configurations": {
+            "production": {
+              "browserTarget": "ng-pomo:build:production"
+            }
+          }
+        },
+        "extract-i18n": {
+          "builder": "@angular-devkit/build-angular:extract-i18n",
+          "options": {
+            "browserTarget": "ng-pomo:build"
+          }
+        },
+        "lint": {
+          "builder": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": [
+              "apps/ng-pomo/src/**/*.ts",
+              "apps/ng-pomo/src/**/*.html"
+            ]
+          }
+        },
+        "test": {
+          "builder": "@nrwl/jest:jest",
+          "outputs": ["coverage/apps/ng-pomo"],
+          "options": {
+            "jestConfig": "apps/ng-pomo/jest.config.js",
+            "passWithNoTests": true
+          }
+        }
+      }
+    },
+    "ng-pomo-e2e": {
+      "root": "apps/ng-pomo-e2e",
+      "sourceRoot": "apps/ng-pomo-e2e/src",
+      "projectType": "application",
+      "architect": {
+        "e2e": {
+          "builder": "@nrwl/cypress:cypress",
+          "options": {
+            "cypressConfig": "apps/ng-pomo-e2e/cypress.json",
+            "tsConfig": "apps/ng-pomo-e2e/tsconfig.e2e.json",
+            "devServerTarget": "ng-pomo:serve"
+          },
+          "configurations": {
+            "production": {
+              "devServerTarget": "ng-pomo:serve:production"
+            }
+          }
+        },
+        "lint": {
+          "builder": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": ["apps/ng-pomo-e2e/**/*.{js,ts}"]
+          }
+        }
+      }
+    }
+  }
+}
