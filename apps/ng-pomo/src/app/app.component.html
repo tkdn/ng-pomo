@@ -1,1 +1,10 @@
-<p>{{ title }}</p>
+<h1>NgPomo App</h1>
+
+<p>Pomodoro Timer</p>
+
+<ng-container *ngIf="remainingMs$ | async as remainingMs">
+  <p>pomo: {{ remainingMs }}</p>
+</ng-container>
+
+<button (click)="start()">Start</button>
+<button (click)="stop()">Stop</button>
