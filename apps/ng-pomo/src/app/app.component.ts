@@ -1,12 +1,6 @@
 import { Component } from '@angular/core';
-import {
-  BehaviorSubject,
-  interval,
-  NEVER,
-  Observable,
-  Subscription,
-} from 'rxjs';
-import { scan, switchMap, takeWhile } from 'rxjs/operators';
+import { BehaviorSubject, interval, NEVER, Observable } from 'rxjs';
+import { map, switchMap, takeWhile } from 'rxjs/operators';
 
 @Component({
   selector: 'ng-pomo-root',
@@ -14,30 +8,32 @@ import { scan, switchMap, takeWhile } from 'rxjs/operators';
   styleUrls: ['./app.component.css'],
 })
 export class AppComponent {
-  remainingMs$: Observable<number>;
-  subscription: Subscription;
+  timer$: Observable<string>;
   interval = 1000;
-  pomoInterval = 5000; // 1000 * 60 * 25;
+  pomoInterval = 3000; // 1000 * 60 * 25;
+  interval$ = interval(this.interval);
   toggle$ = new BehaviorSubject(true);
 
+  get resumable() {
+    return this.toggle$.value === false;
+  }
+
   start(): void {
-    this.remainingMs$ = this.toggle$.pipe(
-      switchMap((resume) => {
-        return resume ? interval(this.interval) : NEVER;
+    this.timer$ = this.toggle$.pipe(
+      switchMap((start) => (start ? this.interval$ : NEVER)),
+      map((count) => {
+        return this.pomoInterval - this.interval * (count + 1);
       }),
-      scan((acc) => {
-        return acc - this.interval;
-      }, this.pomoInterval),
-      takeWhile((time) => {
-        console.log('RemainingMs:', time);
-        return time >= 0;
-      })
+      takeWhile((remainingMs) => {
+        console.log(remainingMs);
+        return remainingMs >= 0;
+      }),
+      map((remainingMs) => this.toMinutesAndSeconds(remainingMs))
     );
   }
 
-  stop(): void {
+  toggle(): void {
     this.toggle$.next(!this.toggle$.value);
-    console.log(this.toggle$);
   }
 
   toMinutesAndSeconds(ms: number): string {
@@ -47,5 +43,9 @@ export class AppComponent {
       '0'
     );
     return `${minutes}:${seconds}`;
+  }
+
+  debug() {
+    console.log(this.timer$);
   }
 }
