@@ -1,10 +1,4 @@
 <h1>NgPomo App</h1>
 <p>Pomodoro Timer</p>
 
-<div [attr.aria-disabled]="(pomoStatus === 'break')">
-  <ng-container>
-    <p>pomo: {{ remaininigMs }}</p>
-  </ng-container>
-
-  <button (click)="startAndPause()">{{ !timer$ ? "Start" : resumable ? "Start" : "Pause" }}</button>
-</div>
+<ng-pomo-focus></ng-pomo-focus>
