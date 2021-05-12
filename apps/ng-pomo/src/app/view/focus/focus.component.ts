@@ -1,16 +1,25 @@
 import { Component, OnInit } from '@angular/core';
-import {
-  BehaviorSubject,
-  interval,
-  NEVER,
-  Observable,
-  Subscription,
-} from 'rxjs';
-import { scan, startWith, switchMap, takeWhile } from 'rxjs/operators';
+import { BehaviorSubject, interval, NEVER } from 'rxjs';
+import { map, scan, switchMap } from 'rxjs/operators';
 
-type PomoStatus = 'flat' | 'pomo' | 'break';
 const ONE_MINUTES = 60;
 const INTERVAL = 1000;
+const POMO_MINUTES = 0.1;
+
+type PomoState = {
+  resumable: boolean;
+  disable: boolean;
+  focusInterval: number;
+  remainingMs: number;
+  interval: number;
+};
+const initialState: PomoState = {
+  resumable: false,
+  disable: false,
+  focusInterval: INTERVAL * ONE_MINUTES * POMO_MINUTES,
+  remainingMs: INTERVAL * ONE_MINUTES * POMO_MINUTES,
+  interval: INTERVAL,
+};
 
 @Component({
   selector: 'ng-pomo-focus',
@@ -18,41 +27,59 @@ const INTERVAL = 1000;
   styleUrls: ['./focus.component.css'],
 })
 export class FocusComponent implements OnInit {
-  timer$: Observable<number>;
-  subscription: Subscription;
-  pomoMinutes = 0.1;
-  pomoInterval = INTERVAL * ONE_MINUTES * this.pomoMinutes;
-  pomoInitial = this.pomoInterval + INTERVAL;
-  time = this.pomoInterval;
-  interval$ = interval(INTERVAL);
-  resumeToggle$ = new BehaviorSubject(false);
-  pomoStatus: PomoStatus = 'flat';
-
-  get resumable() {
-    return this.resumeToggle$.value === false;
-  }
+  state$ = new BehaviorSubject<PomoState>(initialState);
 
   ngOnInit(): void {
-    this.timer$ = this.resumeToggle$.pipe(
-      switchMap((start) => (start ? this.interval$ : NEVER)),
-      startWith(this.pomoInitial),
-      scan((remainingMs) => {
-        return remainingMs - INTERVAL;
-      }, this.pomoInitial),
-      takeWhile((remainingMs) => {
-        return remainingMs >= INTERVAL;
-      })
-    );
-    this.subscription = this.timer$.subscribe({
-      complete: () => {
-        this.resumeToggle$.next(false);
-        this.pomoStatus = 'break';
+    this.state$
+      .pipe(
+        scan((state: PomoState, curr) => {
+          return { ...state, ...curr };
+        }, initialState),
+        switchMap((state) =>
+          state.resumable
+            ? interval(INTERVAL).pipe(
+                map(() => {
+                  this.next(state);
+                  if (this.state$.value.remainingMs <= 0) {
+                    this.stop(state);
+                  }
+                  console.log(this.state$.value);
+                  return this.state$.value;
+                })
+              )
+            : NEVER
+        ),
+        map((val) => val)
+      )
+      .subscribe();
+  }
+
+  startOrPause(): void {
+    this.state$.next({
+      ...this.state$.value,
+      ...{ resumable: !this.state$.value.resumable },
+    });
+  }
+
+  next(currentState: PomoState): void {
+    this.state$.next({
+      ...currentState,
+      ...{ remainingMs: currentState.remainingMs - INTERVAL },
+    });
+  }
+
+  stop(currentState: PomoState): void {
+    this.state$.next({
+      ...currentState,
+      ...{
+        remainingMs: INTERVAL * ONE_MINUTES * POMO_MINUTES,
+        disable: true,
+        resumable: false,
       },
     });
   }
 
-  startAndPause(): void {
-    this.resumeToggle$.next(!this.resumeToggle$.value);
-    this.pomoStatus = 'pomo';
+  reset(): void {
+    this.state$.next(initialState);
   }
 }

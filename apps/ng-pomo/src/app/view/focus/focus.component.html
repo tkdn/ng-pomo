@@ -1,7 +1,8 @@
-<div [attr.aria-disabled]="(pomoStatus === 'break')">
-  <ng-container>
-    <p>pomo: {{ timer$ | async | pomoMinutesAndSeconds}}</p>
+<div [attr.aria-disabled]="(state$ | async).disable">
+  <ng-container *ngIf="state$ | async as state">
+    <p>pomo: {{ state.remainingMs | pomoMinutesAndSeconds }}</p>
   </ng-container>
-
-  <button (click)="startAndPause()">{{ pomoStatus === "flat" ? "Start" : resumable ? "Start" : "Pause" }}</button>
+  <button (click)="startOrPause()">{{(state$ | async).resumable ? "Pause" : "Start" }}</button>
 </div>
+
+<button (click)="reset()">Reset</button>
