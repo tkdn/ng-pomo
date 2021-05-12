@@ -1,15 +1,10 @@
 <h1>NgPomo App</h1>
-
 <p>Pomodoro Timer</p>
 
-<ng-container *ngIf="timer$ | async as timer; else fallback">
-  <p>pomo: {{ timer }}</p>
-</ng-container>
-<ng-template #fallback>
-  <p>pomo: {{ toMinutesAndSeconds(pomoInterval) }}</p>
-</ng-template>
+<div [attr.aria-disabled]="(pomoStatus === 'break')">
+  <ng-container>
+    <p>pomo: {{ remaininigMs }}</p>
+  </ng-container>
 
-<button (click)="start()">Start</button>
-<button (click)="toggle()">{{ resumable ? "Resume" : "Pause" }}</button>
-
-<button (click)="debug()">debug</button>
+  <button (click)="startAndPause()">{{ !timer$ ? "Start" : resumable ? "Start" : "Pause" }}</button>
+</div>
