@@ -1,11 +1,8 @@
-<h1>NgPomo App</h1>
-<p>Pomodoro Timer</p>
-
-<h2>Focus</h2>
-<ng-pomo-timer [active]="focus" [minutes]="25" (completed)="toBreakTime()"></ng-pomo-timer>
-
-<h2>Break</h2>
-<ng-pomo-timer [active]="break" [minutes]="5" (completed)="toFocusTime()"></ng-pomo-timer>
-
-<h2>Count</h2>
-<p>{{ count }}</p>
+<main>
+  <h1>NgPomo App</h1>
+  <p>Pomodoro Timer</p>
+  <ng-pomo-timer [active]="focus" [minutes]="25" (completed)="toBreakTime()" type="pomo"></ng-pomo-timer>
+  <ng-pomo-timer [active]="break" [minutes]="5" (completed)="toFocusTime()" type="break"></ng-pomo-timer>
+  <h2>Count</h2>
+  <ng-pomo-tomato [tomatos]="count"></ng-pomo-tomato>
+</main>

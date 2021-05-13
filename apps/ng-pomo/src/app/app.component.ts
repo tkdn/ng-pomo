@@ -6,17 +6,17 @@ import { Component } from '@angular/core';
   styleUrls: ['./app.component.css'],
 })
 export class AppComponent {
-  count = 0;
+  count = [];
   focus = true;
   break = false;
 
   toFocusTime(): void {
-    this.count++;
     this.focus = true;
     this.break = false;
   }
 
   toBreakTime(): void {
+    this.count.push('pomo');
     this.focus = false;
     this.break = true;
   }
