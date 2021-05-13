@@ -9,10 +9,12 @@ const POMO_INTTERVAL = INTERVAL * ONE_MINUTES * POMO_MINUTES;
 
 type PomoState = {
   resumable: boolean;
-  focusInterval: number;
+  duration: number;
   remainingMs: number;
   interval: number;
 };
+
+type Timer = 'pomo' | 'break';
 
 @Component({
   selector: 'ng-pomo-timer',
@@ -24,21 +26,28 @@ export class TimerComponent implements OnInit {
   active: boolean;
   @Input()
   minutes: number;
+  @Input()
+  type: Timer;
   @Output()
   completed = new EventEmitter<boolean>();
 
   initialState: PomoState = {
     resumable: false,
-    focusInterval: POMO_INTTERVAL,
+    duration: POMO_INTTERVAL,
     remainingMs: POMO_INTTERVAL,
     interval: INTERVAL,
   };
   state$: BehaviorSubject<PomoState>;
 
+  get percentage() {
+    const ratio = this.state$.value.remainingMs / this.state$.value.duration;
+    return Math.floor(100 * ratio * 100) / 100;
+  }
+
   ngOnInit(): void {
     this.initialState = {
       ...this.initialState,
-      focusInterval: INTERVAL * ONE_MINUTES * this.minutes,
+      duration: INTERVAL * ONE_MINUTES * this.minutes,
       remainingMs: INTERVAL * ONE_MINUTES * this.minutes,
     };
     this.state$ = new BehaviorSubject<PomoState>(this.initialState);

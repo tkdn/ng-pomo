@@ -1,1 +1,13 @@
-/* You can add global styles to this file, and also import other style files */
+:root {
+  --base-spacing: 6px;
+  --color-pomo: #d32e15;
+  --color-pomo-light: #f6cbca;
+  --color-break: #15d347;
+  --color-break-light: #caf6d6;
+}
+body {
+  margin: 0 auto;
+  max-width: 480px;
+  text-align: center;
+  background-color: #ddd;
+}

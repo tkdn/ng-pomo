@@ -1,0 +1,12 @@
+main {
+  margin: calc(var(--base-spacing) * 2);
+  padding: calc(var(--base-spacing) * 2);
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background-color: #fff;
+  box-shadow: calc(var(--base-spacing) / 2) calc(var(--base-spacing) / 2) #ccc;
+}
+
+h2 {
+  display: none;
+}

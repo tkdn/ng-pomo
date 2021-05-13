@@ -1,0 +1,15 @@
+<div [attr.aria-disabled]="!active" [attr.aria-hidden]="!active">
+  <ng-pomo-circular-progress-bar [percentage]="percentage" [type]="type">
+    <ng-container *ngIf="state$ | async as state">
+      <p [ngClass]="type">{{ state.remainingMs | pomoMinutesAndSeconds }}</p>
+    </ng-container>
+  </ng-pomo-circular-progress-bar>
+  <div class="btn-container" [ngClass]="type">
+    <button [ngClass]="(state$ | async).resumable ? 'pause' : 'start'" (click)="startOrPause()">{{(state$ |
+      async).resumable ? "Pause" :
+      "Start" }}</button>
+  </div>
+</div>
+
+<!-- <button (click)="reset()">Reset</button>
+<button (click)="debug()">Debug</button> -->
