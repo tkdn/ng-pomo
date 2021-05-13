@@ -5,4 +5,17 @@ import { Component } from '@angular/core';
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css'],
 })
-export class AppComponent {}
+export class AppComponent {
+  focus = true;
+  break = false;
+
+  toFocusTime(): void {
+    this.focus = true;
+    this.break = false;
+  }
+
+  toBreakTime(): void {
+    this.focus = false;
+    this.break = true;
+  }
+}

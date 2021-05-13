@@ -1,4 +1,8 @@
 <h1>NgPomo App</h1>
 <p>Pomodoro Timer</p>
 
-<ng-pomo-focus></ng-pomo-focus>
+<h2>Focus</h2>
+<ng-pomo-timer [active]="focus" [minutes]="25" (completed)="toBreakTime()"></ng-pomo-timer>
+
+<h2>Break</h2>
+<ng-pomo-timer [active]="break" [minutes]="5" (completed)="toFocusTime()"></ng-pomo-timer>

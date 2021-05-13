@@ -2,10 +2,10 @@ import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { AppComponent } from './app.component';
 import { PomoMinutesAndSeconds } from './lib/time';
-import { FocusComponent } from './view/focus/focus.component';
+import { TimerComponent } from './view/timer.component';
 
 @NgModule({
-  declarations: [AppComponent, FocusComponent, PomoMinutesAndSeconds],
+  declarations: [AppComponent, TimerComponent, PomoMinutesAndSeconds],
   imports: [BrowserModule],
   providers: [],
   bootstrap: [AppComponent],

@@ -1,40 +1,52 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { BehaviorSubject, interval, NEVER } from 'rxjs';
 import { map, scan, switchMap } from 'rxjs/operators';
 
 const ONE_MINUTES = 60;
 const INTERVAL = 1000;
-const POMO_MINUTES = 0.1;
+const POMO_MINUTES = 25;
+const POMO_INTTERVAL = INTERVAL * ONE_MINUTES * POMO_MINUTES;
 
 type PomoState = {
   resumable: boolean;
-  disable: boolean;
   focusInterval: number;
   remainingMs: number;
   interval: number;
 };
-const initialState: PomoState = {
-  resumable: false,
-  disable: false,
-  focusInterval: INTERVAL * ONE_MINUTES * POMO_MINUTES,
-  remainingMs: INTERVAL * ONE_MINUTES * POMO_MINUTES,
-  interval: INTERVAL,
-};
 
 @Component({
-  selector: 'ng-pomo-focus',
-  templateUrl: './focus.component.html',
-  styleUrls: ['./focus.component.css'],
+  selector: 'ng-pomo-timer',
+  templateUrl: './timer.component.html',
+  styleUrls: ['./timer.component.css'],
 })
-export class FocusComponent implements OnInit {
-  state$ = new BehaviorSubject<PomoState>(initialState);
+export class TimerComponent implements OnInit {
+  @Input()
+  active: boolean;
+  @Input()
+  minutes: number;
+  @Output()
+  completed = new EventEmitter<boolean>();
+
+  initialState: PomoState = {
+    resumable: false,
+    focusInterval: POMO_INTTERVAL,
+    remainingMs: POMO_INTTERVAL,
+    interval: INTERVAL,
+  };
+  state$: BehaviorSubject<PomoState>;
 
   ngOnInit(): void {
+    this.initialState = {
+      ...this.initialState,
+      focusInterval: INTERVAL * ONE_MINUTES * this.minutes,
+      remainingMs: INTERVAL * ONE_MINUTES * this.minutes,
+    };
+    this.state$ = new BehaviorSubject<PomoState>(this.initialState);
     this.state$
       .pipe(
         scan((state: PomoState, curr) => {
           return { ...state, ...curr };
-        }, initialState),
+        }, this.initialState),
         switchMap((state) =>
           state.resumable
             ? interval(INTERVAL).pipe(
@@ -43,7 +55,6 @@ export class FocusComponent implements OnInit {
                   if (this.state$.value.remainingMs <= 0) {
                     this.stop(state);
                   }
-                  console.log(this.state$.value);
                   return this.state$.value;
                 })
               )
@@ -69,17 +80,21 @@ export class FocusComponent implements OnInit {
   }
 
   stop(currentState: PomoState): void {
+    this.completed.emit(true);
     this.state$.next({
       ...currentState,
       ...{
-        remainingMs: INTERVAL * ONE_MINUTES * POMO_MINUTES,
-        disable: true,
+        remainingMs: INTERVAL * ONE_MINUTES * this.minutes,
         resumable: false,
       },
     });
   }
 
   reset(): void {
-    this.state$.next(initialState);
+    this.state$.next(this.initialState);
+  }
+
+  debug() {
+    console.log(this.state$.value);
   }
 }

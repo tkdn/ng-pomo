@@ -1,20 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { TimerComponent } from './timer.component';
 
-import { FocusComponent } from './focus.component';
-
-describe('FocusComponent', () => {
-  let component: FocusComponent;
-  let fixture: ComponentFixture<FocusComponent>;
+describe('TimerComponent', () => {
+  let component: TimerComponent;
+  let fixture: ComponentFixture<TimerComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ FocusComponent ]
-    })
-    .compileComponents();
+      declarations: [TimerComponent],
+    }).compileComponents();
   });
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(FocusComponent);
+    fixture = TestBed.createComponent(TimerComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
