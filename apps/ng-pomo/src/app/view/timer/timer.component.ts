@@ -1,5 +1,12 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { BehaviorSubject, interval, NEVER } from 'rxjs';
+import {
+  animationFrameScheduler,
+  BehaviorSubject,
+  fromEvent,
+  interval,
+  NEVER,
+  Observable,
+} from 'rxjs';
 import { map, scan, switchMap } from 'rxjs/operators';
 
 const ONE_MINUTES = 60;
@@ -12,6 +19,8 @@ type PomoState = {
   duration: number;
   remainingMs: number;
   interval: number;
+  leave: number;
+  visible: boolean;
 };
 
 type Timer = 'pomo' | 'break';
@@ -36,8 +45,11 @@ export class TimerComponent implements OnInit {
     duration: POMO_INTTERVAL,
     remainingMs: POMO_INTTERVAL,
     interval: INTERVAL,
+    leave: 0,
+    visible: true,
   };
   state$: BehaviorSubject<PomoState>;
+  visibility$: Observable<Event>;
 
   get percentage() {
     const ratio = this.state$.value.remainingMs / this.state$.value.duration;
@@ -58,11 +70,15 @@ export class TimerComponent implements OnInit {
         }, this.initialState),
         switchMap((state) =>
           state.resumable
-            ? interval(INTERVAL).pipe(
+            ? interval(INTERVAL, animationFrameScheduler).pipe(
                 map(() => {
-                  this.next(state);
+                  if (this.state$.value.visible) {
+                    this.next();
+                  } else {
+                    this.leave();
+                  }
                   if (this.state$.value.remainingMs <= 0) {
-                    this.stop(state);
+                    this.stop();
                   }
                   return this.state$.value;
                 })
@@ -72,6 +88,13 @@ export class TimerComponent implements OnInit {
         map((val) => val)
       )
       .subscribe();
+
+    fromEvent(document, 'visibilitychange').subscribe(() => {
+      this.state$.next({
+        ...this.state$.value,
+        visible: !document.hidden,
+      });
+    });
   }
 
   startOrPause(): void {
@@ -81,21 +104,32 @@ export class TimerComponent implements OnInit {
     });
   }
 
-  next(currentState: PomoState): void {
+  private next(): void {
+    const { remainingMs, leave } = this.state$.value;
+    const restoreForeground = leave !== 0;
     this.state$.next({
-      ...currentState,
-      ...{ remainingMs: currentState.remainingMs - INTERVAL },
+      ...this.state$.value,
+      leave: 0,
+      remainingMs: restoreForeground
+        ? remainingMs - (Date.now() - leave)
+        : remainingMs - INTERVAL,
     });
   }
 
-  stop(currentState: PomoState): void {
+  private leave(): void {
+    this.state$.next({
+      ...this.state$.value,
+      leave:
+        this.state$.value.leave === 0 ? Date.now() : this.state$.value.leave,
+    });
+  }
+
+  private stop(): void {
     this.completed.emit(true);
     this.state$.next({
-      ...currentState,
-      ...{
-        remainingMs: INTERVAL * ONE_MINUTES * this.minutes,
-        resumable: false,
-      },
+      ...this.state$.value,
+      remainingMs: INTERVAL * ONE_MINUTES * this.minutes,
+      resumable: false,
     });
   }
 
