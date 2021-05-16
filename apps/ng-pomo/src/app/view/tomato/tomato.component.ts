@@ -7,5 +7,9 @@ import { Component, Input } from '@angular/core';
 })
 export class TomatoComponent {
   @Input()
-  tomatos = [];
+  count = 0;
+
+  get tomatos() {
+    return Array(this.count);
+  }
 }

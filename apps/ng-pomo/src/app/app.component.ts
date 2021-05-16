@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { TimerUsecase } from './usecase/timer';
 
 @Component({
   selector: 'ng-pomo-root',
@@ -6,18 +7,16 @@ import { Component } from '@angular/core';
   styleUrls: ['./app.component.css'],
 })
 export class AppComponent {
-  count = [];
-  focus = true;
-  break = false;
+  timer$ = this.timerUsecase.timer$;
+  percentage$ = this.timerUsecase.percentage$;
 
-  toFocusTime(): void {
-    this.focus = true;
-    this.break = false;
+  constructor(private timerUsecase: TimerUsecase) {}
+
+  start() {
+    this.timerUsecase.start();
   }
 
-  toBreakTime(): void {
-    this.count.push('pomo');
-    this.focus = false;
-    this.break = true;
+  debug() {
+    console.log(this.timerUsecase.timer);
   }
 }

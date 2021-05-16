@@ -1,8 +1,10 @@
 <main>
   <h1>NgPomo App</h1>
   <p>Pomodoro Timer</p>
-  <ng-pomo-timer [active]="focus" [minutes]="25" (completed)="toBreakTime()" type="pomo"></ng-pomo-timer>
-  <ng-pomo-timer [active]="break" [minutes]="5" (completed)="toFocusTime()" type="break"></ng-pomo-timer>
+  <ng-container *ngIf="timer$ | async as timer">
+    <ng-pomo-timer [minutes]="timer.time" [pause]="timer.pause" [percentage]="percentage$ | async" [type]="timer.side"
+      (clickHandler)="start()"></ng-pomo-timer>
+  </ng-container>
   <h2>Count</h2>
-  <ng-pomo-tomato [tomatos]="count"></ng-pomo-tomato>
+  <ng-pomo-tomato [count]="(timer$ | async).pomos"></ng-pomo-tomato>
 </main>
