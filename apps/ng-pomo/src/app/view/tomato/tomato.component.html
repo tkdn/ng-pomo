@@ -1,4 +1,4 @@
 <ul>
-  <li *ngIf="tomatos.length === 0" class="empty">🍅</li>
+  <li *ngIf="tomatos.length === 0" class="empty" (click)="debug()">🍅</li>
   <li *ngFor="let tomato of tomatos">🍅</li>
 </ul>
